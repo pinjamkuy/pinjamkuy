@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #00e676;
+  --color-accent-hover: #00c853;
+  --color-accent-glow: rgba(0, 230, 118, 0.15);
+  --color-accent-surface: rgba(0, 230, 118, 0.08);
+  --color-bg-card: #18181b;
+  --color-bg-primary: #09090b;
+  --color-bg-secondary: #121215;
+}
+
+/* Custom transitions and scrollbar overrides */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+  
+  body {
+    background-color: #09090b;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(24, 24, 27, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+}
+
+/* Pulse animation for live sync */
+@keyframes syncPulse {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  100% { transform: scale(1.25); opacity: 1; }
+}
+
+.animate-sync-pulse {
+  animation: syncPulse 1.5s infinite alternate;
+}
