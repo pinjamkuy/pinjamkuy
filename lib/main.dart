@@ -28,7 +28,7 @@ void main() async {
     url: 'https://wrljckupuktfrlmjoqdc.supabase.co',
     publishableKey: const String.fromEnvironment(
       'SUPABASE_ANON_KEY',
-      defaultValue: 'YOUR_SUPABASE_ANON_KEY_HERE',
+      defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndybGpja3VwdWt0ZnJsbWpvcWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5ODc1MTAsImV4cCI6MjA5NjU2MzUxMH0.7GBql9LizbCXpdw4AEgV2V9j5NJHA2WMisXPczLqfrQ',
     ),
     realtimeClientOptions: const RealtimeClientOptions(
       eventsPerSecond: 2,
