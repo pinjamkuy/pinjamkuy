@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinjamKuy — Web Admin Dashboard</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Boxicons for premium vector icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+    <!-- Toastify JS CSS for notifications -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ================= APP LOADER ================= -->
+    <div id="app-loader" class="app-loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- ================= LOGIN VIEW ================= -->
+    <div id="login-container" class="login-container container-hidden">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class='bx bx-lock-open-alt'></i>
+                </div>
+                <h1>PinjamKuy Admin</h1>
+                <p>Silakan masuk untuk mengelola inventaris & peminjaman</p>
+            </div>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="email">Surel (Email)</label>
+                    <div class="input-wrapper">
+                        <i class='bx bx-envelope'></i>
+                        <input type="email" id="email" placeholder="admin@pinjamkuy.com" required>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Kata Sandi</label>
+                    <div class="input-wrapper">
+                        <i class='bx bx-key'></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                
+                <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+                    Masuk Sekarang <i class='bx bx-right-arrow-alt'></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= DASHBOARD VIEW ================= -->
+    <div id="dashboard-container" class="dashboard-container container-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class='bx bx-cube-alt'></i>
+                    <span>PinjamKuy</span>
+                </div>
+                <div class="badge">ADMIN</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-tab="overview">
+                        <a href="#"><i class='bx bx-grid-alt'></i> Ringkasan</a>
+                    </li>
+                    <li class="nav-item" data-tab="catalog">
+                        <a href="#"><i class='bx bx-package'></i> Kelola Katalog</a>
+                    </li>
+                    <li class="nav-item" data-tab="logs">
+                        <a href="#"><i class='bx bx-history'></i> Riwayat Log</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="btn-logout" class="btn btn-outline btn-block">
+                    <i class='bx bx-log-out'></i> Keluar
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- TOP BAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h2 id="page-title">Dashboard Ringkasan</h2>
+                    <p id="page-subtitle" class="text-muted">Selamat datang kembali di panel admin PinjamKuy.</p>
+                </div>
+                <div class="topbar-right">
+                    <div class="profile-card">
+                        <div class="avatar">
+                            <i class='bx bx-user'></i>
+                        </div>
+                        <div class="profile-info">
+                            <span class="user-email" id="user-email">admin@pinjamkuy.com</span>
+                            <span class="user-role">Super Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB CONTENT CONTAINER -->
+            <div class="content-body">
+                
+                <!-- 1. OVERVIEW TAB -->
+                <section id="tab-overview" class="tab-pane active">
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon stat-total">
+                                <i class='bx bx-archive-in'></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Barang</h3>
+                                <p class="stat-number" id="stat-total-items">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon stat-active">
+                                <i class='bx bx-transfer'></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Sedang Dipinjam</h3>
+                                <p class="stat-number text-warning" id="stat-active-loans">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon stat-available">
+                                <i class='bx bx-check-circle'></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Tersedia</h3>
+                                <p class="stat-number text-accent" id="stat-available-items">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon stat-logs">
+                                <i class='bx bx-notepad'></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Log Transaksi</h3>
+                                <p class="stat-number" id="stat-total-logs">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Section Grid -->
+                    <div class="dashboard-grid">
+                        <!-- Left: Active Loans Table -->
+                        <div class="card card-large">
+                            <div class="card-header">
+                                <h3>Peminjaman Aktif saat Ini</h3>
+                                <div class="card-actions">
+                                    <span class="pulse-indicator"></span> Realtime Sync
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-container">
+                                    <table id="table-active-loans">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Peminjam</th>
+                                                <th>Nama Item</th>
+                                                <th>Kategori</th>
+                                                <th>Tanggal Pinjam</th>
+                                                <th>Status</th>
+                                                <th class="text-center">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="active-loans-body">
+                                            <!-- Dynamically populated -->
+                                            <tr class="table-loading">
+                                                <td colspan="6">Memuat peminjaman aktif...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. CATALOG TAB -->
+                <section id="tab-catalog" class="tab-pane">
+                    <div class="catalog-grid">
+                        <!-- Left: Item Management Form -->
+                        <div class="card card-form">
+                            <div class="card-header">
+                                <h3>Tambah Item Baru</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="add-item-form">
+                                    <div class="input-group">
+                                        <label for="item-name">Nama Barang / Ruangan</label>
+                                        <div class="input-wrapper">
+                                            <i class='bx bx-rename'></i>
+                                            <input type="text" id="item-name" placeholder="Contoh: Kamera Sony A7III" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <label for="item-category">Kategori</label>
+                                        <div class="input-wrapper">
+                                            <i class='bx bx-category'></i>
+                                            <select id="item-category" required>
+                                                <option value="Barang">Barang</option>
+                                                <option value="Ruangan">Ruangan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class='bx bx-plus-circle'></i> Tambah ke Katalog
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Right: Items Catalog Table -->
+                        <div class="card card-table">
+                            <div class="card-header">
+                                <h3>Daftar Inventaris & Ruangan</h3>
+                                <div class="filter-wrapper">
+                                    <input type="text" id="catalog-search" placeholder="Cari inventaris..." class="table-search">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-container">
+                                    <table id="table-catalog-items">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Item</th>
+                                                <th>Kategori</th>
+                                                <th>Status Ketersediaan</th>
+                                                <th class="text-center">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="catalog-items-body">
+                                            <!-- Dynamically populated -->
+                                            <tr class="table-loading">
+                                                <td colspan="4">Memuat daftar inventaris...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. LOGS TAB -->
+                <section id="tab-logs" class="tab-pane">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Riwayat Lengkap Peminjaman</h3>
+                            <button id="btn-export-pdf" class="btn btn-success">
+                                <i class='bx bx-file-blank'></i> Ekspor PDF Laporan
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table id="table-all-logs">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Peminjam</th>
+                                            <th>Nama Item</th>
+                                            <th>Kategori</th>
+                                            <th>Tanggal Pinjam</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="all-logs-body">
+                                        <!-- Dynamically populated -->
+                                        <tr class="table-loading">
+                                            <td colspan="5">Memuat riwayat logs...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+
+    </div>
+
+    <!-- CDN Dependencies -->
+    
+    <!-- Supabase JS Client library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- jsPDF & jsPDF AutoTable for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Toastify JS for premium popups -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <!-- Application Logic Script -->
+    <script type="module" src="/app.js"></script>
+</body>
+</html>
