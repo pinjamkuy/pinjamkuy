@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileDown } from 'lucide-react';
-import { supabase } from '../App.tsx';
-import { BorrowLog } from '../types.ts';
+import { supabase } from '../App';
+import { BorrowLog } from '../types';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Archive, ArrowLeftRight, CheckCircle2, ClipboardList } from 'lucide-react';
-import { supabase } from '../App.tsx';
-import { BorrowLog } from '../types.ts';
+import { supabase } from '../App';
+import { BorrowLog } from '../types';
 import confetti from 'canvas-confetti';
 
 export default function Overview() {

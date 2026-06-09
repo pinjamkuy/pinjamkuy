@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { createClient, Session } from '@supabase/supabase-js';
-import Login from './components/Login.tsx';
-import Sidebar from './components/Sidebar.tsx';
-import Topbar from './components/Topbar.tsx';
-import Overview from './components/Overview.tsx';
-import Catalog from './components/Catalog.tsx';
-import Logs from './components/Logs.tsx';
+import Login from './components/Login';
+import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
+import Overview from './components/Overview';
+import Catalog from './components/Catalog';
+import Logs from './components/Logs';
 
 // ─── Supabase Configuration ───────────────────────────────────────────────
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';

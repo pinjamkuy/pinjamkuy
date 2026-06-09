@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Search, Trash2 } from 'lucide-react';
-import { supabase } from '../App.tsx';
-import { Item } from '../types.ts';
+import { supabase } from '../App';
+import { Item } from '../types';
 import confetti from 'canvas-confetti';
 
 export default function Catalog() {

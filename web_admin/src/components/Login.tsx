@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, KeyRound, ArrowRight, LockKeyhole } from 'lucide-react';
-import { supabase } from '../App.tsx';
+import { supabase } from '../App';
 
 interface LoginProps {
   onLoginSuccess: () => void;

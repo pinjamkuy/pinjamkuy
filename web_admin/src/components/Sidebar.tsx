@@ -1,5 +1,5 @@
 import { LayoutDashboard, Archive, History, LogOut } from 'lucide-react';
-import { supabase } from '../App.tsx';
+import { supabase } from '../App';
 
 interface SidebarProps {
   currentTab: 'overview' | 'catalog' | 'logs';
