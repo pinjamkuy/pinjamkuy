@@ -1,0 +1,40 @@
+name: pinjamkuy
+description: "PinjamKuy - Inventory & Room Borrowing System"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Backend
+  supabase_flutter: ^2.9.0
+
+  # State Management & Routing
+  get: ^4.7.2
+
+  # UI/UX
+  google_fonts: ^6.2.1
+  shimmer: ^3.0.0
+  lottie: ^3.3.1
+
+  # Features
+  pdf: ^3.11.2
+  printing: ^5.14.2
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/lottie/

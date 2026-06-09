@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PinjamKuy - Sistem peminjaman inventaris & ruangan modern dengan antarmuka premium dark mode.">
+  <meta name="theme-color" content="#0D0D0D">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PinjamKuy">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>PinjamKuy — Inventory & Room Borrowing</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0D0D0D;
+      overflow: hidden;
+    }
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    }
+    .loading-logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #00E676, #00BFA5);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .loading-logo svg {
+      width: 32px;
+      height: 32px;
+      fill: #003300;
+    }
+    .loading-text {
+      color: #F5F5F5;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .loading-sub {
+      color: #9E9E9E;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.85; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-container" id="loading">
+    <div class="loading-logo">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1 0-2 1-2 2v3c0 1 1 2 2 2h16c1 0 2-1 2-2V4c0-1-1-2-2-2zm0 5H4V4h16v3zm-8 4H4c-1 0-2 1-2 2v7c0 1 1 2 2 2h8c1 0 2-1 2-2v-7c0-1-1-2-2-2zm0 9H4v-7h8v7zm8-9h-4c-1 0-2 1-2 2v7c0 1 1 2 2 2h4c1 0 2-1 2-2v-7c0-1-1-2-2-2zm0 9h-4v-7h4v7z"/></svg>
+    </div>
+    <div class="loading-text">PinjamKuy</div>
+    <div class="loading-sub">Memuat aplikasi...</div>
+  </div>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
