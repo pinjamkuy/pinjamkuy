@@ -67,10 +67,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               <input
                 type="email"
                 required
-                placeholder="admin@pinjamkuy.com"
+                placeholder="pinj4mkuy@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white placeholder-zinc-600 focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white placeholder-zinc-650 focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
               />
             </div>
           </div>

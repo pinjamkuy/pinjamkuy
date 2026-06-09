@@ -20,16 +20,25 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState<TabType>('overview');
 
+  const validateSession = (currentSession: Session | null) => {
+    if (currentSession && currentSession.user.email !== 'pinj4mkuy@gmail.com') {
+      supabase.auth.signOut();
+      alert('Akses Ditolak: Surel Anda tidak terdaftar sebagai Administrator.');
+      return null;
+    }
+    return currentSession;
+  };
+
   useEffect(() => {
     // 1. Initial Session Check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      setSession(validateSession(session));
       setLoading(false);
     });
 
     // 2. Auth State Changed Listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setSession(validateSession(session));
       setLoading(false);
     });
 
@@ -54,7 +63,7 @@ export default function App() {
   // Helper to force session refresh on login success
   async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession();
-    setSession(session);
+    setSession(validateSession(session));
   }
 
   return (
