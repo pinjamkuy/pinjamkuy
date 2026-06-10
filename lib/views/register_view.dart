@@ -100,7 +100,7 @@ class _RegisterViewState extends State<RegisterView> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
           onPressed: () => Get.back(),
         ),
       ),
@@ -169,7 +169,7 @@ class _RegisterViewState extends State<RegisterView> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'nama@surel.com',
                       prefixIcon: Icon(
                         Icons.mail_outline_rounded,
@@ -202,7 +202,7 @@ class _RegisterViewState extends State<RegisterView> {
                     controller: _passwordController,
                     obscureText: true,
                     style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Minimal 6 karakter',
                       prefixIcon: Icon(
                         Icons.lock_outline_rounded,
@@ -235,7 +235,7 @@ class _RegisterViewState extends State<RegisterView> {
                     controller: _confirmPasswordController,
                     obscureText: true,
                     style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Ulangi kata sandi',
                       prefixIcon: Icon(
                         Icons.lock_outline_rounded,

@@ -20,7 +20,7 @@ void main() async {
   ]);
 
   // System UI overlay style
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
     systemNavigationBarColor: AppTheme.surface,
@@ -50,8 +50,9 @@ class PinjamKuyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'PinjamKuy',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       defaultTransition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 300),
       initialRoute: '/',

@@ -1,11 +1,13 @@
-import { User } from 'lucide-react';
+import { User, Sun, Moon } from 'lucide-react';
 
 interface TopbarProps {
   email: string;
   currentTab: 'overview' | 'catalog' | 'logs';
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
 }
 
-export default function Topbar({ email, currentTab }: TopbarProps) {
+export default function Topbar({ email, currentTab, theme, onToggleTheme }: TopbarProps) {
   const getHeaderInfo = () => {
     switch (currentTab) {
       case 'overview':
@@ -37,14 +39,26 @@ export default function Topbar({ email, currentTab }: TopbarProps) {
         <p className="text-xs text-zinc-400 mt-1">{info.subtitle}</p>
       </div>
 
-      {/* User Card */}
-      <div className="flex items-center gap-3 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl">
-        <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-300">
-          <User className="w-4 h-4" />
-        </div>
-        <div className="flex flex-col text-left">
-          <span className="text-xs font-semibold text-zinc-200 truncate max-w-[150px]">{email}</span>
-          <span className="text-[10px] text-zinc-500 font-medium leading-none mt-0.5">Super Admin</span>
+      {/* Right Controls */}
+      <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <button
+          onClick={onToggleTheme}
+          className="p-2.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 rounded-xl transition-all cursor-pointer"
+          title={theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
+        >
+          {theme === 'light' ? <Moon className="w-4.5 h-4.5" /> : <Sun className="w-4.5 h-4.5" />}
+        </button>
+
+        {/* User Card */}
+        <div className="flex items-center gap-3 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl">
+          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-300">
+            <User className="w-4 h-4" />
+          </div>
+          <div className="flex flex-col text-left">
+            <span className="text-xs font-semibold text-zinc-200 truncate max-w-[150px]">{email}</span>
+            <span className="text-[10px] text-zinc-500 font-medium leading-none mt-0.5">Super Admin</span>
+          </div>
         </div>
       </div>
 

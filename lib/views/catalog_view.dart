@@ -72,7 +72,7 @@ class CatalogView extends GetView<CatalogController> {
                                   Container(
                                     width: 6,
                                     height: 6,
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       color: AppTheme.accent,
                                       shape: BoxShape.circle,
                                     ),
@@ -116,7 +116,7 @@ class CatalogView extends GetView<CatalogController> {
                                   Get.offAllNamed('/login');
                                 }
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.logout_rounded,
                                 color: AppTheme.textSecondary,
                                 size: 20,
@@ -150,7 +150,7 @@ class CatalogView extends GetView<CatalogController> {
                             color: AppTheme.textTertiary,
                             fontSize: 14,
                           ),
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.search_rounded,
                             color: AppTheme.textTertiary,
                             size: 20,
@@ -280,9 +280,9 @@ class CatalogView extends GetView<CatalogController> {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.surface,
-          borderRadius: BorderRadius.vertical(
+          borderRadius: const BorderRadius.vertical(
             top: Radius.circular(AppTheme.radiusXLarge),
           ),
         ),
@@ -372,7 +372,7 @@ class CatalogView extends GetView<CatalogController> {
                   color: AppTheme.textPrimary,
                   fontSize: 15,
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Masukkan nama lengkap',
                   prefixIcon: Icon(
                     Icons.person_outline_rounded,
@@ -466,7 +466,7 @@ class CatalogView extends GetView<CatalogController> {
                   shape: BoxShape.circle,
                   boxShadow: AppTheme.accentGlow,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_rounded,
                   size: 40,
                   color: AppTheme.accent,

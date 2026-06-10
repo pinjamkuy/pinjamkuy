@@ -20,6 +20,23 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState<TabType>('overview');
+
+  // Theme state: defaults to light to match user preference for a bright setup
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return 'light'; // Clean light theme by default
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
   
   const checkIfResetMode = () => {
     return window.location.hash.includes('recovery') || 
@@ -97,14 +114,23 @@ export default function App() {
     setSession(validateSession(session));
   }
 
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   return (
-    <div className="flex min-h-screen bg-zinc-950 text-zinc-50 font-sans">
+    <div className="flex min-h-screen bg-zinc-950 text-zinc-50 font-sans transition-colors duration-200">
       {/* Sidebar Navigation */}
       <Sidebar currentTab={currentTab} onChangeTab={setCurrentTab} />
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
-        <Topbar email={session.user.email ?? 'pinj4mkuy@gmail.com'} currentTab={currentTab} />
+        <Topbar 
+          email={session.user.email ?? 'pinj4mkuy@gmail.com'} 
+          currentTab={currentTab} 
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
 
         <main className="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto">
           {currentTab === 'overview' && <Overview />}

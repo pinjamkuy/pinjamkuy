@@ -1,13 +1,109 @@
 @import "tailwindcss";
 
+:root {
+  /* Brand/Accent (Indigo) */
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-glow: rgba(79, 70, 229, 0.1);
+  --accent-surface: rgba(79, 70, 229, 0.05);
+
+  /* Emerald map to Indigo */
+  --emerald-50: #e0e7ff;
+  --emerald-100: #c7d2fe;
+  --emerald-200: #a5b4fc;
+  --emerald-300: #818cf8;
+  --emerald-400: #6366f1;
+  --emerald-500: #4f46e5;
+  --emerald-600: #4338ca;
+  --emerald-700: #3730a3;
+  --emerald-800: #312e81;
+  --emerald-900: #1e1b4b;
+  --emerald-950: #12103e;
+
+  /* Zinc map to Light Slate Palette */
+  --zinc-50: #0f172a;
+  --zinc-100: #0f172a;
+  --zinc-200: #1e293b;
+  --zinc-300: #334155;
+  --zinc-400: #475569;
+  --zinc-500: #64748b;
+  --zinc-600: #94a3b8;
+  --zinc-700: #cbd5e1;
+  --zinc-800: #e2e8f0;
+  --zinc-900: #f8fafc;
+  --zinc-950: #ffffff;
+
+  --white-color: #0f172a;
+}
+
+/* Dark theme overrides */
+html.dark {
+  /* Brand/Accent (Indigo Light) */
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+  --accent-glow: rgba(129, 140, 248, 0.15);
+  --accent-surface: rgba(129, 140, 248, 0.08);
+
+  /* Emerald map to Indigo Light */
+  --emerald-50: #eef2f6;
+  --emerald-100: #e0e7ff;
+  --emerald-200: #c7d2fe;
+  --emerald-300: #a5b4fc;
+  --emerald-400: #818cf8;
+  --emerald-500: #6366f1;
+  --emerald-600: #4f46e5;
+  --emerald-700: #4338ca;
+  --emerald-800: #3730a3;
+  --emerald-900: #312e81;
+  --emerald-950: #1e1b4b;
+
+  /* Zinc map to Dark Slate Palette */
+  --zinc-50: #f8fafc;
+  --zinc-100: #f1f5f9;
+  --zinc-200: #e2e8f0;
+  --zinc-300: #cbd5e1;
+  --zinc-400: #94a3b8;
+  --zinc-500: #64748b;
+  --zinc-600: #475569;
+  --zinc-700: #334155;
+  --zinc-800: #1e293b;
+  --zinc-900: #0f172a;
+  --zinc-950: #0b0f19;
+
+  --white-color: #ffffff;
+}
+
 @theme {
-  --color-accent: #00e676;
-  --color-accent-hover: #00c853;
-  --color-accent-glow: rgba(0, 230, 118, 0.15);
-  --color-accent-surface: rgba(0, 230, 118, 0.08);
-  --color-bg-card: #18181b;
-  --color-bg-primary: #09090b;
-  --color-bg-secondary: #121215;
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-glow: var(--accent-glow);
+  --color-accent-surface: var(--accent-surface);
+  
+  --color-zinc-50: var(--zinc-50);
+  --color-zinc-100: var(--zinc-100);
+  --color-zinc-200: var(--zinc-200);
+  --color-zinc-300: var(--zinc-300);
+  --color-zinc-400: var(--zinc-400);
+  --color-zinc-500: var(--zinc-500);
+  --color-zinc-600: var(--zinc-600);
+  --color-zinc-700: var(--zinc-700);
+  --color-zinc-800: var(--zinc-800);
+  --color-zinc-900: var(--zinc-900);
+  --color-zinc-950: var(--zinc-950);
+
+  --color-emerald-50: var(--emerald-50);
+  --color-emerald-100: var(--emerald-100);
+  --color-emerald-200: var(--emerald-200);
+  --color-emerald-300: var(--emerald-300);
+  --color-emerald-400: var(--emerald-400);
+  --color-emerald-500: var(--emerald-500);
+  --color-emerald-600: var(--emerald-600);
+  --color-emerald-700: var(--emerald-700);
+  --color-emerald-800: var(--emerald-800);
+  --color-emerald-900: var(--emerald-900);
+  --color-emerald-950: var(--emerald-950);
+
+  --color-white: var(--white-color);
 }
 
 /* Custom transitions and scrollbar overrides */
@@ -17,32 +113,34 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #09090b;
+    background: var(--zinc-950);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--zinc-800);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.16);
+    background: var(--zinc-700);
   }
   
   body {
-    background-color: #09090b;
+    background-color: var(--zinc-950);
+    color: var(--zinc-50);
     font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
-/* Glassmorphism utility */
+/* Card Panel utility */
 .glass-panel {
-  background: rgba(24, 24, 27, 0.7);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--zinc-900);
+  border: 1px solid var(--zinc-800);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
 }
 
 .glass-panel-hover:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  border-color: var(--zinc-700);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Pulse animation for live sync */

@@ -134,7 +134,7 @@ class _LoginViewState extends State<LoginView> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'nama@surel.com',
                       prefixIcon: Icon(
                         Icons.mail_outline_rounded,
@@ -167,7 +167,7 @@ class _LoginViewState extends State<LoginView> {
                     controller: _passwordController,
                     obscureText: true,
                     style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Masukkan kata sandi',
                       prefixIcon: Icon(
                         Icons.lock_outline_rounded,
