@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Search, Trash2 } from 'lucide-react';
+import { PlusCircle, Search, Trash2, Pencil, X } from 'lucide-react';
 import { supabase } from '../App';
 import { Item } from '../types';
 import confetti from 'canvas-confetti';
@@ -11,11 +11,18 @@ export default function Catalog() {
   // Form state
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState<'Barang' | 'Ruangan'>('Barang');
-  const [newItemImageUrl, setNewItemImageUrl] = useState('');
+  const [newFile, setNewFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Edit modal state
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editCategory, setEditCategory] = useState<'Barang' | 'Ruangan'>('Barang');
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [editImageUrl, setEditImageUrl] = useState<string | null>(null);
 
   const fetchItems = async () => {
     try {
@@ -55,20 +62,45 @@ export default function Catalog() {
 
     setSubmitting(true);
     try {
+      let uploadedUrl = null;
+
+      if (newFile) {
+        const fileExt = newFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('item-images')
+          .upload(fileName, newFile);
+
+        if (uploadError) {
+          throw new Error('Gagal mengunggah foto. Pastikan bucket "item-images" sudah dibuat di Supabase Storage dan diatur sebagai Public.');
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('item-images')
+          .getPublicUrl(fileName);
+
+        uploadedUrl = urlData.publicUrl;
+      }
+
       const { error } = await supabase
         .from('items')
         .insert({
           name: newItemName.trim(),
           category: newItemCategory,
           is_available: true,
-          image_url: newItemImageUrl.trim() || null,
+          image_url: uploadedUrl,
         });
 
       if (error) throw error;
 
       setNewItemName('');
-      setNewItemImageUrl('');
+      setNewFile(null);
       
+      // Reset file input element
+      const fileInput = document.getElementById('new-file-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+
       // Fire confetti for celebration
       confetti({
         particleCount: 50,
@@ -85,12 +117,74 @@ export default function Catalog() {
         colors: ['#00e676', '#ffffff']
       });
 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Gagal menambahkan item.');
+      alert(err.message || 'Gagal menambahkan item.');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleUpdateItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+
+    setSubmitting(true);
+    try {
+      let finalImageUrl = editImageUrl;
+
+      if (editFile) {
+        const fileExt = editFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('item-images')
+          .upload(fileName, editFile);
+
+        if (uploadError) {
+          throw new Error('Gagal mengunggah foto baru. Pastikan bucket "item-images" sudah dibuat di Supabase Storage dan diatur sebagai Public.');
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('item-images')
+          .getPublicUrl(fileName);
+
+        finalImageUrl = urlData.publicUrl;
+      }
+
+      const { error } = await supabase
+        .from('items')
+        .update({
+          name: editName.trim(),
+          category: editCategory,
+          image_url: finalImageUrl,
+        })
+        .eq('id', editingItem.id);
+
+      if (error) throw error;
+
+      setEditingItem(null);
+      fetchItems();
+
+      // Reset form
+      setEditFile(null);
+      const fileInput = document.getElementById('edit-file-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'Gagal memperbarui item.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEditClick = (item: Item) => {
+    setEditingItem(item);
+    setEditName(item.name);
+    setEditCategory(item.category);
+    setEditImageUrl(item.image_url || null);
+    setEditFile(null);
   };
 
   const handleToggleAvailable = async (itemId: string, isChecked: boolean, name: string) => {
@@ -145,7 +239,7 @@ export default function Catalog() {
                 placeholder="Contoh: Kamera Sony A7III"
                 value={newItemName}
                 onChange={(e) => setNewItemName(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white placeholder-zinc-600 focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white placeholder-zinc-650 focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
               />
             </div>
 
@@ -162,13 +256,13 @@ export default function Catalog() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Link Gambar (URL - Opsional)</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Unggah Foto (Opsional)</label>
               <input
-                type="url"
-                placeholder="https://example.com/gambar.jpg"
-                value={newItemImageUrl}
-                onChange={(e) => setNewItemImageUrl(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white placeholder-zinc-650 focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+                id="new-file-input"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setNewFile(e.target.files?.[0] || null)}
+                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-zinc-200 hover:file:bg-zinc-700 file:cursor-pointer"
               />
             </div>
 
@@ -271,6 +365,15 @@ export default function Catalog() {
                             <div className="w-9 h-5 bg-zinc-850 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-400 peer-checked:after:bg-emerald-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500/10 peer-checked:border-emerald-500/20 border border-zinc-800"></div>
                           </label>
 
+                          {/* Edit Action */}
+                          <button
+                            onClick={() => handleEditClick(item)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-800 border border-zinc-700 text-zinc-350 hover:bg-zinc-700 hover:text-white transition-all cursor-pointer"
+                            title="Edit Item"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+
                           {/* Delete Action */}
                           <button
                             onClick={() => handleDeleteItem(item.id, item.name)}
@@ -289,6 +392,104 @@ export default function Catalog() {
           )}
         </div>
       </div>
+
+      {/* Edit Item Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl w-full max-w-md animate-scale-in">
+            <div className="flex justify-between items-center px-6 py-5 border-b border-zinc-800">
+              <h3 className="text-base font-bold text-white">Edit Item</h3>
+              <button 
+                onClick={() => setEditingItem(null)}
+                className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleUpdateItem} className="p-6 space-y-5">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Nama Barang / Ruangan</label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Kategori</label>
+                <select
+                  value={editCategory}
+                  onChange={(e) => setEditCategory(e.target.value as 'Barang' | 'Ruangan')}
+                  className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+                >
+                  <option value="Barang">Barang</option>
+                  <option value="Ruangan">Ruangan</option>
+                </select>
+              </div>
+
+              {/* Current Image View */}
+              {editImageUrl && (
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Foto Saat Ini</label>
+                  <div className="relative w-full h-32 rounded-lg border border-zinc-800 overflow-hidden bg-zinc-950/40 animate-fade-in">
+                    <img 
+                      src={editImageUrl} 
+                      alt="Current preview" 
+                      className="w-full h-full object-contain"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEditImageUrl(null)}
+                      className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-500 text-white py-1 px-2.5 rounded-md text-xs font-bold transition-colors cursor-pointer"
+                      title="Hapus foto saat ini"
+                    >
+                      Hapus Foto
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  {editImageUrl ? 'Ganti Foto (Opsional)' : 'Unggah Foto (Opsional)'}
+                </label>
+                <input
+                  id="edit-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setEditFile(e.target.files?.[0] || null)}
+                  className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-zinc-200 hover:file:bg-zinc-700 file:cursor-pointer"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  className="flex-1 py-3 px-4 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-lg transition-colors cursor-pointer text-sm"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-zinc-950 font-bold rounded-lg transition-all cursor-pointer text-sm"
+                >
+                  {submitting ? (
+                    <span className="w-5 h-5 border-2 border-zinc-950/20 border-t-zinc-950 rounded-full animate-spin"></span>
+                  ) : (
+                    'Simpan'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
