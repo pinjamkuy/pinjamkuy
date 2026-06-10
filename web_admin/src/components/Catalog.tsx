@@ -11,6 +11,7 @@ export default function Catalog() {
   // Form state
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState<'Barang' | 'Ruangan'>('Barang');
+  const [newItemImageUrl, setNewItemImageUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
   
   // Search state
@@ -60,11 +61,13 @@ export default function Catalog() {
           name: newItemName.trim(),
           category: newItemCategory,
           is_available: true,
+          image_url: newItemImageUrl.trim() || null,
         });
 
       if (error) throw error;
 
       setNewItemName('');
+      setNewItemImageUrl('');
       
       // Fire confetti for celebration
       confetti({
@@ -158,6 +161,17 @@ export default function Catalog() {
               </select>
             </div>
 
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Link Gambar (URL - Opsional)</label>
+              <input
+                type="url"
+                placeholder="https://example.com/gambar.jpg"
+                value={newItemImageUrl}
+                onChange={(e) => setNewItemImageUrl(e.target.value)}
+                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white placeholder-zinc-650 focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={submitting}
@@ -213,7 +227,22 @@ export default function Catalog() {
                 <tbody className="divide-y divide-zinc-800/60">
                   {filteredItems.map((item) => (
                     <tr key={item.id} className="hover:bg-zinc-800/10 transition-colors">
-                      <td className="py-4 font-semibold text-zinc-100">{item.name}</td>
+                      <td className="py-4 font-semibold text-zinc-100">
+                        <div className="flex items-center gap-3">
+                          {item.image_url ? (
+                            <img 
+                              src={item.image_url} 
+                              alt={item.name} 
+                              className="w-10 h-10 object-cover rounded-lg border border-zinc-800"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 flex items-center justify-center bg-zinc-800 border border-zinc-700/60 rounded-lg text-zinc-450 text-xs">
+                              {item.category === 'Barang' ? '📦' : '🚪'}
+                            </div>
+                          )}
+                          <span>{item.name}</span>
+                        </div>
+                      </td>
                       <td className="py-4">
                         <span className="px-2 py-0.5 text-xs font-medium bg-zinc-800 border border-zinc-700/60 rounded text-zinc-400">
                           {item.category}

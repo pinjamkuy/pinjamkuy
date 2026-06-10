@@ -3,6 +3,7 @@ export interface Item {
   name: string;
   category: 'Barang' | 'Ruangan';
   is_available: boolean;
+  image_url?: string | null;
 }
 
 export interface BorrowLog {

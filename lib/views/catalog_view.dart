@@ -287,12 +287,27 @@ class CatalogView extends GetView<CatalogController> {
                         AppTheme.radiusMedium,
                       ),
                     ),
-                    child: Icon(
-                      item.isBarang
-                          ? Icons.camera_alt_rounded
-                          : Icons.meeting_room_rounded,
-                      color: AppTheme.accent,
-                      size: 24,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                      child: item.imageUrl != null && item.imageUrl!.isNotEmpty
+                          ? Image.network(
+                              item.imageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Icon(
+                                item.isBarang
+                                    ? Icons.camera_alt_rounded
+                                    : Icons.meeting_room_rounded,
+                                color: AppTheme.accent,
+                                size: 24,
+                              ),
+                            )
+                          : Icon(
+                              item.isBarang
+                                  ? Icons.camera_alt_rounded
+                                  : Icons.meeting_room_rounded,
+                              color: AppTheme.accent,
+                              size: 24,
+                            ),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -553,91 +568,105 @@ class _ItemCard extends StatelessWidget {
             width: 0.5,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Icon
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
+              // Image / Fallback Icon
+              Expanded(
+                child: Container(
+                  width: double.infinity,
                   color: item.isAvailable
                       ? AppTheme.accentSurface
                       : AppTheme.dangerSurface,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                ),
-                child: Icon(
-                  _categoryIcon,
-                  color: item.isAvailable ? AppTheme.accent : AppTheme.danger,
-                  size: 24,
-                ),
-              ),
-              const Spacer(),
-
-              // Category tag
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: item.isBarang
-                      ? AppTheme.accentSurface
-                      : AppTheme.warningSurface,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  item.category,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: item.isBarang ? AppTheme.accent : AppTheme.warning,
-                  ),
+                  child: item.imageUrl != null && item.imageUrl!.isNotEmpty
+                      ? Image.network(
+                          item.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            _categoryIcon,
+                            color: item.isAvailable ? AppTheme.accent : AppTheme.danger,
+                            size: 32,
+                          ),
+                        )
+                      : Icon(
+                          _categoryIcon,
+                          color: item.isAvailable ? AppTheme.accent : AppTheme.danger,
+                          size: 32,
+                        ),
                 ),
               ),
-              const SizedBox(height: 8),
-
-              // Name
-              Text(
-                item.name,
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
-                  height: 1.2,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 6),
-
-              // Status
-              Row(
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: item.isAvailable
-                          ? AppTheme.accent
-                          : AppTheme.danger,
-                      shape: BoxShape.circle,
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Category tag
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: item.isBarang
+                            ? AppTheme.accentSurface
+                            : AppTheme.warningSurface,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        item.category,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: item.isBarang ? AppTheme.accent : AppTheme.warning,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    item.isAvailable ? 'Tersedia' : 'Dipinjam',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: item.isAvailable
-                          ? AppTheme.accent
-                          : AppTheme.danger,
+                    const SizedBox(height: 6),
+
+                    // Name
+                    Text(
+                      item.name,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                        height: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+
+                    // Status
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: item.isAvailable
+                                ? AppTheme.accent
+                                : AppTheme.danger,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          item.isAvailable ? 'Tersedia' : 'Dipinjam',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: item.isAvailable
+                                ? AppTheme.accent
+                                : AppTheme.danger,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
