@@ -15,8 +15,12 @@ class CatalogView extends GetView<CatalogController> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
+        child: RefreshIndicator(
+          color: AppTheme.primary,
+          onRefresh: controller.refreshCatalog,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
             // ── Header ──────────────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
@@ -202,8 +206,9 @@ class CatalogView extends GetView<CatalogController> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildCategoryChip(String label) {
     final isSelected = controller.selectedCategory.value == label;

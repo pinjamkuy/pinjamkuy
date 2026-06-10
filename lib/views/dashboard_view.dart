@@ -18,9 +18,17 @@ class DashboardView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
+        child: RefreshIndicator(
+          color: AppTheme.primary,
+          onRefresh: () async {
+            // StreamBuilder will automatically rebuild on database changes,
+            // we can add a small delay to show the refresh indicator spinner.
+            await Future.delayed(const Duration(milliseconds: 600));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(20),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Header
@@ -284,8 +292,9 @@ class DashboardView extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildGuideStep({
     required String stepNumber,

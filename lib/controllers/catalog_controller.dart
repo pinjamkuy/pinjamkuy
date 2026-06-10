@@ -43,6 +43,13 @@ class CatalogController extends GetxController {
     );
   }
 
+  /// Refresh catalog manually (pull to refresh)
+  Future<void> refreshCatalog() async {
+    _streamSub?.cancel();
+    _subscribeToRealtime();
+    await Future.delayed(const Duration(milliseconds: 600));
+  }
+
   /// Filter items by category
   List<ItemModel> get filteredItems {
     var result = items.toList();
