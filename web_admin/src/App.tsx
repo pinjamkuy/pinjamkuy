@@ -25,7 +25,9 @@ export default function App() {
     return window.location.hash.includes('recovery') || 
            window.location.hash.includes('type=recovery') || 
            window.location.search.includes('type=recovery') ||
-           window.location.href.includes('recovery');
+           window.location.search.includes('mode=reset') ||
+           window.location.href.includes('recovery') ||
+           window.location.href.includes('reset');
   };
 
   const [isResetMode, setIsResetMode] = useState(() => checkIfResetMode());
