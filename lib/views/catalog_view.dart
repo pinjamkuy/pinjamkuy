@@ -28,28 +28,33 @@ class CatalogView extends GetView<CatalogController> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'PinjamKuy',
-                              style: GoogleFonts.inter(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                color: AppTheme.textPrimary,
-                                letterSpacing: -1,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'PinjamKuy',
+                                style: GoogleFonts.inter(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.textPrimary,
+                                  letterSpacing: -1,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Temukan & pinjam yang kamu butuhkan',
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                color: AppTheme.textSecondary,
+                              const SizedBox(height: 4),
+                              Text(
+                                'Temukan & pinjam yang kamu butuhkan',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color: AppTheme.textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 12),
                         // Status indicator + Logout
                         Row(
                           mainAxisSize: MainAxisSize.min,
