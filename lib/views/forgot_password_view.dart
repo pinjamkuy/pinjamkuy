@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,11 +31,30 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
     try {
       final email = _emailController.text.trim();
 
-      // Trigger Supabase password reset link
-      await Supabase.instance.client.auth.resetPasswordForEmail(
-        email,
-        redirectTo: 'https://pinjamkuy.vercel.app/?mode=reset',
-      );
+      // Trigger Supabase password reset link using raw HTTP to bypass PKCE verifier mismatch
+      final httpClient = HttpClient();
+      try {
+        final uri = Uri.parse('https://wrljckupuktfrlmjoqdc.supabase.co/auth/v1/recover?redirect_to=https://pinjamkuy.vercel.app/?mode=reset');
+        final request = await httpClient.postUrl(uri);
+        request.headers.set('apikey', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndybGpja3VwdWt0ZnJsbWpvcWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5ODc1MTAsImV4cCI6MjA5NjU2MzUxMH0.7GBql9LizbCXpdw4AEgV2V9j5NJHA2WMisXPczLqfrQ');
+        request.headers.set('Content-Type', 'application/json');
+        
+        final body = jsonEncode({'email': email});
+        request.add(utf8.encode(body));
+        
+        final response = await request.close();
+        if (response.statusCode != 200) {
+          final responseBody = await response.transform(utf8.decoder).join();
+          try {
+            final errorData = jsonDecode(responseBody);
+            throw AuthException(errorData['msg'] ?? 'Gagal mengirim email pemulihan.');
+          } catch (_) {
+            throw const AuthException('Gagal mengirim email pemulihan.');
+          }
+        }
+      } finally {
+        httpClient.close();
+      }
 
       Get.defaultDialog(
         title: 'Tautan Dikirim',
