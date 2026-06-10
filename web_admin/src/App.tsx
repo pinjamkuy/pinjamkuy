@@ -7,6 +7,7 @@ import Topbar from './components/Topbar';
 import Overview from './components/Overview';
 import Catalog from './components/Catalog';
 import Logs from './components/Logs';
+import Announcements from './components/Announcements';
 
 // ─── Supabase Configuration ───────────────────────────────────────────────
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
@@ -14,7 +15,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-type TabType = 'overview' | 'catalog' | 'logs';
+type TabType = 'overview' | 'catalog' | 'logs' | 'announcements';
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -135,6 +136,7 @@ export default function App() {
         <main className="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto">
           {currentTab === 'overview' && <Overview />}
           {currentTab === 'catalog' && <Catalog />}
+          {currentTab === 'announcements' && <Announcements />}
           {currentTab === 'logs' && <Logs />}
         </main>
       </div>

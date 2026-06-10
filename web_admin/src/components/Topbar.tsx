@@ -2,7 +2,7 @@ import { User, Sun, Moon } from 'lucide-react';
 
 interface TopbarProps {
   email: string;
-  currentTab: 'overview' | 'catalog' | 'logs';
+  currentTab: 'overview' | 'catalog' | 'logs' | 'announcements';
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
 }
@@ -20,10 +20,20 @@ export default function Topbar({ email, currentTab, theme, onToggleTheme }: Topb
           title: 'Kelola Inventaris & Ruangan',
           subtitle: 'Tambah, ubah ketersediaan, atau hapus item dari katalog peminjaman.',
         };
+      case 'announcements':
+        return {
+          title: 'Kelola Pengumuman Kampus',
+          subtitle: 'Tambah, ubah, atau hapus informasi pengumuman kampus untuk mahasiswa.',
+        };
       case 'logs':
         return {
           title: 'Laporan Log Transaksi',
           subtitle: 'Lihat seluruh riwayat transaksi peminjaman barang dan ruangan.',
+        };
+      default:
+        return {
+          title: 'Panel Admin',
+          subtitle: 'Aplikasi Manajemen PinjamKuy.',
         };
     }
   };

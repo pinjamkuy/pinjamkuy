@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
+import '../services/supabase_service.dart';
+import '../models/announcement_model.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -208,15 +211,72 @@ class DashboardView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               
-              _buildAnnouncementCard(
-                title: 'Peminjaman Studio Podcast',
-                desc: 'Studio Podcast & Recording dibuka setiap Senin-Jumat pukul 08:00 hingga 16:00 WITA. Harap lakukan booking minimal 2 jam sebelum penggunaan.',
-                date: 'Hari ini',
-              ),
-              _buildAnnouncementCard(
-                title: 'Pengembalian Inventaris LDK',
-                desc: 'Semua barang inventaris organisasi LDK yang dipinjam wajib dikembalikan ke sekre maksimal 1 hari setelah kegiatan berakhir.',
-                date: 'Kemarin',
+              StreamBuilder<List<AnnouncementModel>>(
+                stream: SupabaseService.streamAnnouncements(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        'Gagal memuat pengumuman: ${snapshot.error}',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    );
+                  }
+                  final announcements = snapshot.data ?? [];
+                  if (announcements.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: Text(
+                          'Tidak ada pengumuman kampus saat ini.',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: AppTheme.textSecondary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: announcements.map((announcement) {
+                      String dateStr = '';
+                      final localDate = announcement.createdAt.toLocal();
+                      final now = DateTime.now();
+                      final today = DateTime(now.year, now.month, now.day);
+                      final yesterday = today.subtract(const Duration(days: 1));
+                      final itemDate = DateTime(localDate.year, localDate.month, localDate.day);
+
+                      if (itemDate == today) {
+                        dateStr = 'Hari ini';
+                      } else if (itemDate == yesterday) {
+                        dateStr = 'Kemarin';
+                      } else {
+                        dateStr = DateFormat('dd MMM yyyy').format(localDate);
+                      }
+
+                      return _buildAnnouncementCard(
+                        title: announcement.title,
+                        desc: announcement.content,
+                        date: dateStr,
+                      );
+                    }).toList(),
+                  );
+                },
               ),
               // Bottom Spacer
               const SizedBox(height: 100),

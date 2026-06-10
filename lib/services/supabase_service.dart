@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/item_model.dart';
 import '../models/borrow_log_model.dart';
+import '../models/announcement_model.dart';
 
 class SupabaseService {
   static SupabaseClient get _client => Supabase.instance.client;
@@ -149,4 +150,18 @@ class SupabaseService {
       borrowerName: borrowerName,
     );
   }
+
+  // ─── Announcements ──────────────────────────────────────────────
+
+  /// Stream real-time changes on the announcements table
+  static Stream<List<AnnouncementModel>> streamAnnouncements() {
+    return _client
+        .from('announcements')
+        .stream(primaryKey: ['id'])
+        .order('created_at', ascending: false)
+        .map((list) => list
+            .map((e) => AnnouncementModel.fromJson(e))
+            .toList());
+  }
 }
+

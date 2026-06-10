@@ -1,9 +1,9 @@
-import { LayoutDashboard, Archive, History, LogOut } from 'lucide-react';
+import { LayoutDashboard, Archive, History, Megaphone, LogOut } from 'lucide-react';
 import { supabase } from '../App';
 
 interface SidebarProps {
-  currentTab: 'overview' | 'catalog' | 'logs';
-  onChangeTab: (tab: 'overview' | 'catalog' | 'logs') => void;
+  currentTab: 'overview' | 'catalog' | 'logs' | 'announcements';
+  onChangeTab: (tab: 'overview' | 'catalog' | 'logs' | 'announcements') => void;
 }
 
 export default function Sidebar({ currentTab, onChangeTab }: SidebarProps) {
@@ -58,6 +58,19 @@ export default function Sidebar({ currentTab, onChangeTab }: SidebarProps) {
             >
               <Archive className="w-5 h-5" />
               Kelola Katalog
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => onChangeTab('announcements')}
+              className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                currentTab === 'announcements'
+                  ? 'bg-emerald-500/10 text-emerald-400 font-semibold'
+                  : 'text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200'
+              }`}
+            >
+              <Megaphone className="w-5 h-5" />
+              Kelola Pengumuman
             </button>
           </li>
           <li>
