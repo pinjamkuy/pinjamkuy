@@ -25,51 +25,112 @@ class HomeView extends StatelessWidget {
     ];
 
     return Obx(() => Scaffold(
+      extendBody: true,
       body: IndexedStack(
         index: homeController.currentIndex.value,
         children: views,
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          border: Border(
-            top: BorderSide(color: AppTheme.surfaceBorder, width: 1),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
+            border: Border.all(
+              color: AppTheme.surfaceBorder,
+              width: 1,
+            ),
+            boxShadow: AppTheme.softShadow,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                index: 0,
+                icon: Icons.dashboard_outlined,
+                activeIcon: Icons.dashboard_rounded,
+                label: 'Beranda',
+                homeController: homeController,
+              ),
+              _buildNavItem(
+                index: 1,
+                icon: Icons.inventory_2_outlined,
+                activeIcon: Icons.inventory_2_rounded,
+                label: 'Katalog',
+                homeController: homeController,
+              ),
+              _buildNavItem(
+                index: 2,
+                icon: Icons.history_outlined,
+                activeIcon: Icons.history_rounded,
+                label: 'Aktivitas',
+                homeController: homeController,
+              ),
+              _buildNavItem(
+                index: 3,
+                icon: Icons.person_outline_rounded,
+                activeIcon: Icons.person_rounded,
+                label: 'Profil',
+                homeController: homeController,
+              ),
+            ],
           ),
         ),
-        child: BottomNavigationBar(
-          currentIndex: homeController.currentIndex.value,
-          onTap: homeController.changeIndex,
-          backgroundColor: AppTheme.surface,
-          selectedItemColor: AppTheme.accent,
-          unselectedItemColor: AppTheme.textTertiary,
-          type: BottomNavigationBarType.fixed,
-          elevation: 0,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 11),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_outlined),
-              activeIcon: Icon(Icons.dashboard_rounded),
-              label: 'Beranda',
+      ),
+    ));
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required HomeController homeController,
+  }) {
+    final isSelected = homeController.currentIndex.value == index;
+    return GestureDetector(
+      onTap: () => homeController.changeIndex(index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: isSelected ? 1.1 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                color: isSelected ? AppTheme.accent : AppTheme.textSecondary,
+                size: 24,
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.inventory_2_outlined),
-              activeIcon: Icon(Icons.inventory_2_rounded),
-              label: 'Katalog',
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? AppTheme.accent : AppTheme.textSecondary,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 11,
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history_outlined),
-              activeIcon: Icon(Icons.history_rounded),
-              label: 'Aktivitas',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded),
-              activeIcon: Icon(Icons.person_rounded),
-              label: 'Profil',
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: isSelected ? 6 : 0,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppTheme.accent,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ],
         ),
       ),
-    ));
+    );
   }
 }
