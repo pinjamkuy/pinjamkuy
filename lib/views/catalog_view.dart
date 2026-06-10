@@ -224,7 +224,7 @@ class CatalogView extends GetView<CatalogController> {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isSelected ? const Color(0xFF003300) : AppTheme.textSecondary,
+            color: isSelected ? Colors.white : AppTheme.textSecondary,
           ),
         ),
       ),
@@ -366,28 +366,28 @@ class CatalogView extends GetView<CatalogController> {
                   onPressed: isSubmitting.value
                       ? null
                       : () async {
-                          if (!formKey.currentState!.validate()) return;
-                          isSubmitting.value = true;
+                           if (!formKey.currentState!.validate()) return;
+                           isSubmitting.value = true;
 
-                          final success = await controller.borrowItem(
-                            item.id,
-                            nameController.text.trim(),
-                          );
+                           final success = await controller.borrowItem(
+                             item.id,
+                             nameController.text.trim(),
+                           );
 
-                          isSubmitting.value = false;
+                           isSubmitting.value = false;
 
-                          if (success) {
-                            Get.back(); // Close bottom sheet
-                            _showSuccessDialog(item.name);
-                          }
-                        },
+                           if (success) {
+                             Get.back(); // Close bottom sheet
+                             _showSuccessDialog(item.name);
+                           }
+                         },
                   child: isSubmitting.value
                       ? const SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Color(0xFF003300),
+                            color: Colors.white,
                           ),
                         )
                       : Row(
