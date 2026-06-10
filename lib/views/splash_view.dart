@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 
 class SplashView extends StatefulWidget {
@@ -53,7 +54,12 @@ class _SplashViewState extends State<SplashView>
 
     // Navigate after animation
     Future.delayed(const Duration(milliseconds: 2800), () {
-      Get.offAllNamed('/home');
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session != null) {
+        Get.offAllNamed('/home');
+      } else {
+        Get.offAllNamed('/login');
+      }
     });
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/catalog_controller.dart';
 import '../models/item_model.dart';
 import '../theme/app_theme.dart';
@@ -49,42 +50,81 @@ class CatalogView extends GetView<CatalogController> {
                             ),
                           ],
                         ),
-                        // Status indicator
-                        Obx(() => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.accentSurface,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTheme.accent.withValues(alpha: 0.3),
+                        // Status indicator + Logout
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Obx(() => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.accentSurface,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.accent.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: const BoxDecoration(
+                                      color: AppTheme.accent,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '${controller.availableCount} tersedia',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.accent,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
+                            const SizedBox(width: 4),
+                            IconButton(
+                              onPressed: () async {
+                                final confirmLogout = await Get.dialog<bool>(
+                                  AlertDialog(
+                                    title: const Text('Keluar'),
+                                    content: const Text('Apakah Anda yakin ingin keluar dari aplikasi?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Get.back(result: false),
+                                        child: const Text('Batal'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Get.back(result: true),
+                                        child: const Text(
+                                          'Keluar',
+                                          style: TextStyle(color: AppTheme.danger, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (confirmLogout == true) {
+                                  await Supabase.instance.client.auth.signOut();
+                                  Get.offAllNamed('/login');
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.logout_rounded,
+                                color: AppTheme.textSecondary,
+                                size: 20,
+                              ),
+                              tooltip: 'Keluar',
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 6,
-                                height: 6,
-                                decoration: const BoxDecoration(
-                                  color: AppTheme.accent,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '${controller.availableCount} tersedia',
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.accent,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
+                          ],
+                        )
                       ],
                     ),
                     const SizedBox(height: 20),

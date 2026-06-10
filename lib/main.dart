@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'theme/app_theme.dart';
 import 'views/splash_view.dart';
 import 'views/home_view.dart';
+import 'views/login_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,6 +60,10 @@ class PinjamKuyApp extends StatelessWidget {
         GetPage(
           name: '/home',
           page: () => const HomeView(),
+        ),
+        GetPage(
+          name: '/login',
+          page: () => const LoginView(),
         ),
       ],
     );

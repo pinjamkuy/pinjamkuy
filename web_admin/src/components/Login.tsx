@@ -36,7 +36,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_center,#111827_0%,#030712_100%)] p-6">
       <div className="w-full max-w-md p-8 glass-panel rounded-2xl shadow-2xl relative overflow-hidden transition-all duration-300">
-        
+
         {/* Glow Element */}
         <div className="absolute -top-16 -left-16 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute -bottom-16 -right-16 w-32 h-32 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -67,7 +67,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               <input
                 type="email"
                 required
-                placeholder="pinj4mkuy@gmail.com"
+                placeholder="admin@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white placeholder-zinc-650 focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"

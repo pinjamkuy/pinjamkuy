@@ -21,7 +21,7 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState<TabType>('overview');
 
   const validateSession = (currentSession: Session | null) => {
-    if (currentSession && currentSession.user.email !== 'pinj4mkuy@gmail.com') {
+    if (currentSession && currentSession.user.email !== 'admin@gmail.com') {
       supabase.auth.signOut();
       alert('Akses Ditolak: Surel Anda tidak terdaftar sebagai Administrator.');
       return null;
@@ -74,7 +74,7 @@ export default function App() {
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
         <Topbar email={session.user.email ?? 'admin@pinjamkuy.com'} currentTab={currentTab} />
-        
+
         <main className="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto">
           {currentTab === 'overview' && <Overview />}
           {currentTab === 'catalog' && <Catalog />}
