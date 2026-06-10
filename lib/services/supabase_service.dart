@@ -50,7 +50,7 @@ class SupabaseService {
     await _client.from('borrow_logs').insert({
       'item_id': itemId,
       'borrower_name': borrowerName,
-      'borrow_date': DateTime.now().toIso8601String(),
+      'borrow_date': DateTime.now().toUtc().toIso8601String(),
       'status': 'Dipinjam',
     });
   }
