@@ -129,7 +129,7 @@ class _RegisterViewState extends State<RegisterView> {
                           child: const Icon(
                             Icons.person_add_alt_1_rounded,
                             size: 36,
-                            color: Color(0xFF003300),
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -157,7 +157,7 @@ class _RegisterViewState extends State<RegisterView> {
 
                   // Email Input
                   Text(
-                    'Surel (Email)',
+                    'Surel (Email) Kampus',
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -170,7 +170,7 @@ class _RegisterViewState extends State<RegisterView> {
                     keyboardType: TextInputType.emailAddress,
                     style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
                     decoration: InputDecoration(
-                      hintText: 'nama@surel.com',
+                      hintText: 'NIM@students.universitasmulia.ac.id',
                       prefixIcon: Icon(
                         Icons.mail_outline_rounded,
                         color: AppTheme.textTertiary,
@@ -180,8 +180,13 @@ class _RegisterViewState extends State<RegisterView> {
                       if (value == null || value.trim().isEmpty) {
                         return 'Alamat surel harus diisi';
                       }
-                      if (!GetUtils.isEmail(value.trim())) {
+                      final email = value.trim();
+                      if (!GetUtils.isEmail(email)) {
                         return 'Alamat surel tidak valid';
+                      }
+                      final regExp = RegExp(r'^[0-9]+@students\.universitasmulia\.ac\.id$');
+                      if (!regExp.hasMatch(email)) {
+                        return 'Harus menggunakan email mahasiswa Universitas Mulia\n(Contoh: 2311082@students.universitasmulia.ac.id)';
                       }
                       return null;
                     },
@@ -266,7 +271,7 @@ class _RegisterViewState extends State<RegisterView> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                color: Color(0xFF003300),
+                                color: Colors.white,
                               ),
                             )
                           : Row(
