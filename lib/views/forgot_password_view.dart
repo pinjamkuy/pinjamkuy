@@ -32,7 +32,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       // Trigger Supabase password reset link
       await Supabase.instance.client.auth.resetPasswordForEmail(
         email,
-        redirectTo: 'https://pinjamkuy.vercel.app/#recovery',
+        redirectTo: 'https://pinjamkuy.vercel.app',
       );
 
       Get.defaultDialog(
