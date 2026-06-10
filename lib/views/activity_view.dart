@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 import '../models/borrow_log_model.dart';
 import '../theme/app_theme.dart';
@@ -16,11 +18,28 @@ class ActivityView extends StatefulWidget {
 
 class _ActivityViewState extends State<ActivityView> {
   late Future<List<BorrowLogModel>> _logsFuture;
+  StreamSubscription? _realtimeSubscription;
 
   @override
   void initState() {
     super.initState();
     _refreshLogs();
+    _subscribeToRealtime();
+  }
+
+  @override
+  void dispose() {
+    _realtimeSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeToRealtime() {
+    _realtimeSubscription = Supabase.instance.client
+        .from('borrow_logs')
+        .stream(primaryKey: ['id'])
+        .listen((_) {
+          _refreshLogs();
+        });
   }
 
   void _refreshLogs() {
