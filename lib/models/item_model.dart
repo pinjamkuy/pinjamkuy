@@ -4,6 +4,8 @@ class ItemModel {
   final String category; // 'Barang' or 'Ruangan'
   final bool isAvailable;
   final String? imageUrl;
+  final int quantity;
+  final int availableQuantity;
 
   ItemModel({
     required this.id,
@@ -11,6 +13,8 @@ class ItemModel {
     required this.category,
     required this.isAvailable,
     this.imageUrl,
+    this.quantity = 1,
+    this.availableQuantity = 1,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +24,8 @@ class ItemModel {
       category: json['category'] as String,
       isAvailable: json['is_available'] as bool? ?? true,
       imageUrl: json['image_url'] as String?,
+      quantity: json['quantity'] as int? ?? 1,
+      availableQuantity: json['available_quantity'] as int? ?? 1,
     );
   }
 
@@ -30,6 +36,8 @@ class ItemModel {
       'category': category,
       'is_available': isAvailable,
       'image_url': imageUrl,
+      'quantity': quantity,
+      'available_quantity': availableQuantity,
     };
   }
 
@@ -39,6 +47,8 @@ class ItemModel {
     String? category,
     bool? isAvailable,
     String? imageUrl,
+    int? quantity,
+    int? availableQuantity,
   }) {
     return ItemModel(
       id: id ?? this.id,
@@ -46,6 +56,8 @@ class ItemModel {
       category: category ?? this.category,
       isAvailable: isAvailable ?? this.isAvailable,
       imageUrl: imageUrl ?? this.imageUrl,
+      quantity: quantity ?? this.quantity,
+      availableQuantity: availableQuantity ?? this.availableQuantity,
     );
   }
 

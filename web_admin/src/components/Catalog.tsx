@@ -11,6 +11,7 @@ export default function Catalog() {
   // Form state
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState<'Barang' | 'Ruangan'>('Barang');
+  const [newItemQuantity, setNewItemQuantity] = useState<number>(1);
   const [newFile, setNewFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   
@@ -21,6 +22,7 @@ export default function Catalog() {
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [editName, setEditName] = useState('');
   const [editCategory, setEditCategory] = useState<'Barang' | 'Ruangan'>('Barang');
+  const [editQuantity, setEditQuantity] = useState<number>(1);
   const [editFile, setEditFile] = useState<File | null>(null);
   const [editImageUrl, setEditImageUrl] = useState<string | null>(null);
 
@@ -83,6 +85,8 @@ export default function Catalog() {
         uploadedUrl = urlData.publicUrl;
       }
 
+      const quantityVal = newItemCategory === 'Barang' ? newItemQuantity : 1;
+
       const { error } = await supabase
         .from('items')
         .insert({
@@ -90,11 +94,14 @@ export default function Catalog() {
           category: newItemCategory,
           is_available: true,
           image_url: uploadedUrl,
+          quantity: quantityVal,
+          available_quantity: quantityVal,
         });
 
       if (error) throw error;
 
       setNewItemName('');
+      setNewItemQuantity(1);
       setNewFile(null);
       
       // Reset file input element
@@ -152,12 +159,19 @@ export default function Catalog() {
         finalImageUrl = urlData.publicUrl;
       }
 
+      const totalQty = editCategory === 'Barang' ? editQuantity : 1;
+      const currentlyBorrowed = (editingItem.quantity || 1) - (editingItem.available_quantity || 1);
+      const newAvail = Math.max(0, totalQty - currentlyBorrowed);
+
       const { error } = await supabase
         .from('items')
         .update({
           name: editName.trim(),
           category: editCategory,
           image_url: finalImageUrl,
+          quantity: totalQty,
+          available_quantity: newAvail,
+          is_available: newAvail > 0,
         })
         .eq('id', editingItem.id);
 
@@ -183,15 +197,25 @@ export default function Catalog() {
     setEditingItem(item);
     setEditName(item.name);
     setEditCategory(item.category);
+    setEditQuantity(item.quantity || 1);
     setEditImageUrl(item.image_url || null);
     setEditFile(null);
   };
 
   const handleToggleAvailable = async (itemId: string, isChecked: boolean, name: string) => {
     try {
+      const selectedItem = items.find(i => i.id === itemId);
+      if (!selectedItem) return;
+
+      const totalQty = selectedItem.quantity || 1;
+      const newAvail = isChecked ? totalQty : 0;
+
       const { error } = await supabase
         .from('items')
-        .update({ is_available: isChecked })
+        .update({ 
+          is_available: isChecked,
+          available_quantity: newAvail
+        })
         .eq('id', itemId);
 
       if (error) throw error;
@@ -255,6 +279,20 @@ export default function Catalog() {
               </select>
             </div>
 
+            {newItemCategory === 'Barang' && (
+              <div className="space-y-2 animate-fade-in">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Jumlah Stok (Quantity)</label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  value={newItemQuantity}
+                  onChange={(e) => setNewItemQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Unggah Foto (Opsional)</label>
               <input
@@ -314,78 +352,91 @@ export default function Catalog() {
                   <tr className="border-b border-zinc-800">
                     <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Nama Item</th>
                     <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Kategori</th>
-                    <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Status</th>
+                    <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Status / Stok</th>
                     <th className="pb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60">
-                  {filteredItems.map((item) => (
-                    <tr key={item.id} className="hover:bg-zinc-800/10 transition-colors">
-                      <td className="py-4 font-semibold text-zinc-100">
-                        <div className="flex items-center gap-3">
-                          {item.image_url ? (
-                            <img 
-                              src={item.image_url} 
-                              alt={item.name} 
-                              className="w-10 h-10 object-cover rounded-lg border border-zinc-800"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 flex items-center justify-center bg-zinc-800 border border-zinc-700/60 rounded-lg text-zinc-450 text-xs">
-                              {item.category === 'Barang' ? '📦' : '🚪'}
-                            </div>
-                          )}
-                          <span>{item.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-4">
-                        <span className="px-2 py-0.5 text-xs font-medium bg-zinc-800 border border-zinc-700/60 rounded text-zinc-400">
-                          {item.category}
-                        </span>
-                      </td>
-                      <td className="py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          item.is_available
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${item.is_available ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
-                          {item.is_available ? 'Tersedia' : 'Sedang Dipinjam'}
-                        </span>
-                      </td>
-                      <td className="py-4">
-                        <div className="flex items-center justify-center gap-4">
-                          {/* Toggle Switch */}
-                          <label className="relative inline-flex items-center cursor-pointer" title="Ubah ketersediaan">
-                            <input
-                              type="checkbox"
-                              checked={item.is_available}
-                              onChange={(e) => handleToggleAvailable(item.id, e.target.checked, item.name)}
-                              className="sr-only peer"
-                            />
-                            <div className="w-9 h-5 bg-zinc-850 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-400 peer-checked:after:bg-emerald-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500/10 peer-checked:border-emerald-500/20 border border-zinc-800"></div>
-                          </label>
+                  {filteredItems.map((item) => {
+                    const isBarang = item.category === 'Barang';
+                    const hasStock = (item.available_quantity ?? 1) > 0;
+                    const isAvail = item.is_available && hasStock;
 
-                          {/* Edit Action */}
-                          <button
-                            onClick={() => handleEditClick(item)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-800 border border-zinc-700 text-zinc-350 hover:bg-zinc-700 hover:text-white transition-all cursor-pointer"
-                            title="Edit Item"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
+                    return (
+                      <tr key={item.id} className="hover:bg-zinc-800/10 transition-colors">
+                        <td className="py-4 font-semibold text-zinc-100">
+                          <div className="flex items-center gap-3">
+                            {item.image_url ? (
+                              <img 
+                                src={item.image_url} 
+                                alt={item.name} 
+                                className="w-10 h-10 object-cover rounded-lg border border-zinc-800"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 flex items-center justify-center bg-zinc-800 border border-zinc-700/60 rounded-lg text-zinc-450 text-xs">
+                                {item.category === 'Barang' ? '📦' : '🚪'}
+                              </div>
+                            )}
+                            <span>{item.name}</span>
+                          </div>
+                        </td>
+                        <td className="py-4">
+                          <span className="px-2 py-0.5 text-xs font-medium bg-zinc-800 border border-zinc-700/60 rounded text-zinc-400">
+                            {item.category}
+                          </span>
+                        </td>
+                        <td className="py-4">
+                          <div className="flex flex-col gap-1.5">
+                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold w-max ${
+                              isAvail
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${isAvail ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
+                              {isAvail ? 'Tersedia' : 'Sedang Dipinjam'}
+                            </span>
+                            {isBarang && (
+                              <span className="text-[10px] text-zinc-550 font-medium pl-2">
+                                Stok: {item.available_quantity} / {item.quantity} tersisa
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4">
+                          <div className="flex items-center justify-center gap-4">
+                            {/* Toggle Switch */}
+                            <label className="relative inline-flex items-center cursor-pointer" title="Ubah ketersediaan">
+                              <input
+                                type="checkbox"
+                                checked={isAvail}
+                                onChange={(e) => handleToggleAvailable(item.id, e.target.checked, item.name)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-9 h-5 bg-zinc-850 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-400 peer-checked:after:bg-emerald-400 after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500/10 peer-checked:border-emerald-500/20 border border-zinc-800"></div>
+                            </label>
 
-                          {/* Delete Action */}
-                          <button
-                            onClick={() => handleDeleteItem(item.id, item.name)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all cursor-pointer"
-                            title="Hapus Item"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            {/* Edit Action */}
+                            <button
+                              onClick={() => handleEditClick(item)}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-800 border border-zinc-700 text-zinc-350 hover:bg-zinc-700 hover:text-white transition-all cursor-pointer"
+                              title="Edit Item"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+
+                            {/* Delete Action */}
+                            <button
+                              onClick={() => handleDeleteItem(item.id, item.name)}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all cursor-pointer"
+                              title="Hapus Item"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -430,6 +481,20 @@ export default function Catalog() {
                   <option value="Ruangan">Ruangan</option>
                 </select>
               </div>
+
+              {editCategory === 'Barang' && (
+                <div className="space-y-2 animate-fade-in">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Jumlah Stok (Quantity)</label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={editQuantity}
+                    onChange={(e) => setEditQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-800 rounded-lg text-sm text-white focus:border-emerald-500 focus:bg-zinc-950 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+                  />
+                </div>
+              )}
 
               {/* Current Image View */}
               {editImageUrl && (

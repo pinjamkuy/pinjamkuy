@@ -646,7 +646,7 @@ class _ItemCard extends StatelessWidget {
                           width: 6,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: item.isAvailable
+                            color: item.isAvailable && item.availableQuantity > 0
                                 ? AppTheme.accent
                                 : AppTheme.danger,
                             shape: BoxShape.circle,
@@ -654,11 +654,15 @@ class _ItemCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          item.isAvailable ? 'Tersedia' : 'Dipinjam',
+                          item.isBarang
+                              ? (item.availableQuantity > 0
+                                  ? 'Tersisa: ${item.availableQuantity}'
+                                  : 'Stok Habis')
+                              : (item.isAvailable ? 'Tersedia' : 'Dipinjam'),
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: item.isAvailable
+                            fontWeight: FontWeight.w600,
+                            color: item.isAvailable && item.availableQuantity > 0
                                 ? AppTheme.accent
                                 : AppTheme.danger,
                           ),

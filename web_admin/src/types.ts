@@ -4,6 +4,8 @@ export interface Item {
   category: 'Barang' | 'Ruangan';
   is_available: boolean;
   image_url?: string | null;
+  quantity?: number;
+  available_quantity?: number;
 }
 
 export interface BorrowLog {

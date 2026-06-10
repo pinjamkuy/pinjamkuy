@@ -83,7 +83,7 @@ class SupabaseService {
         .toList();
   }
 
-  /// Return an item: update borrow log status and item availability
+  /// Return an item: update borrow log status and increment available quantity
   static Future<void> returnItem({
     required String logId,
     required String itemId,
@@ -94,17 +94,54 @@ class SupabaseService {
         .update({'status': 'Selesai'})
         .eq('id', logId);
 
-    // Update item availability
-    await updateItemAvailability(itemId, true);
+    // Fetch current quantities
+    final itemResponse = await _client
+        .from('items')
+        .select('quantity, available_quantity')
+        .eq('id', itemId)
+        .single();
+    
+    final totalQty = itemResponse['quantity'] as int? ?? 1;
+    final currentAvail = itemResponse['available_quantity'] as int? ?? 1;
+    final newAvail = (currentAvail + 1).clamp(0, totalQty);
+
+    // Update availability
+    await _client
+        .from('items')
+        .update({
+          'available_quantity': newAvail,
+          'is_available': true,
+        })
+        .eq('id', itemId);
   }
 
-  /// Borrow an item: create log and update availability
+  /// Borrow an item: decrement available quantity and create borrow log
   static Future<void> borrowItem({
     required String itemId,
     required String borrowerName,
   }) async {
-    // Update item availability to false
-    await updateItemAvailability(itemId, false);
+    // Fetch current quantities
+    final itemResponse = await _client
+        .from('items')
+        .select('quantity, available_quantity')
+        .eq('id', itemId)
+        .single();
+    
+    final currentAvail = itemResponse['available_quantity'] as int? ?? 1;
+    if (currentAvail <= 0) {
+      throw Exception('Stok item ini sedang kosong / tidak tersedia.');
+    }
+
+    final newAvail = currentAvail - 1;
+
+    // Update availability
+    await _client
+        .from('items')
+        .update({
+          'available_quantity': newAvail,
+          'is_available': newAvail > 0,
+        })
+        .eq('id', itemId);
 
     // Create borrow log
     await createBorrowLog(
