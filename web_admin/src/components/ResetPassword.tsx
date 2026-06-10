@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { KeyRound, ArrowRight, LockKeyhole } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { KeyRound, ArrowRight, LockKeyhole, AlertTriangle } from 'lucide-react';
 import { supabase } from '../App';
 
 export default function ResetPassword() {
@@ -8,9 +8,44 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  
+  const [session, setSession] = useState<any>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    // 1. Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setSession(session);
+        setCheckingSession(false);
+      }
+    });
+
+    // 2. Listen to changes (e.g. when PKCE code exchange finishes)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (newSession) {
+        setSession(newSession);
+        setCheckingSession(false);
+      }
+    });
+
+    // 3. Timeout fallback: if no session after 3 seconds, stop checking
+    const timer = setTimeout(() => {
+      setCheckingSession(false);
+    }, 3500);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
+  }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!session) {
+      setErrorMsg('Sesi tidak ditemukan. Tautan pemulihan mungkin sudah kedaluwarsa atau tidak valid.');
+      return;
+    }
     if (newPassword.length < 6) {
       setErrorMsg('Kata sandi minimal harus 6 karakter.');
       return;
@@ -41,6 +76,17 @@ export default function ResetPassword() {
     }
   };
 
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-6">
+        <div className="text-center">
+          <div className="w-12 h-12 border-3 border-emerald-500/10 rounded-full border-t-emerald-400 animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-zinc-400">Memverifikasi tautan pemulihan sandi Anda...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_center,#111827_0%,#030712_100%)] p-6">
       <div className="w-full max-w-md p-8 glass-panel rounded-2xl shadow-2xl relative overflow-hidden transition-all duration-300">
@@ -56,6 +102,11 @@ export default function ResetPassword() {
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white mb-2">Atur Ulang Kata Sandi</h1>
           <p className="text-sm text-zinc-400">Silakan masukkan kata sandi baru Anda di bawah ini</p>
+          {session && (
+            <p className="text-xs text-emerald-400 mt-2 font-medium bg-emerald-500/10 py-1 px-3 rounded-full inline-block">
+              Surel: {session.user.email}
+            </p>
+          )}
         </div>
 
         {/* Success Alert */}
@@ -74,8 +125,21 @@ export default function ResetPassword() {
           </div>
         )}
 
+        {/* Invalid/Expired Link Alert */}
+        {!session && !successMsg && (
+          <div className="text-center py-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 text-red-400 mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Tautan Tidak Valid</h3>
+            <p className="text-sm text-zinc-400 mb-6">
+              Tautan pemulihan kata sandi Anda sudah kedaluwarsa, tidak valid, atau sudah pernah digunakan sebelumnya. Silakan minta tautan baru dari aplikasi mobile PinjamKuy.
+            </p>
+          </div>
+        )}
+
         {/* Form */}
-        {!successMsg && (
+        {session && !successMsg && (
           <form onSubmit={handleResetPassword} className="space-y-6">
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Kata Sandi Baru</label>
