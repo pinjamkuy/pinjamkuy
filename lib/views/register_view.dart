@@ -4,27 +4,29 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _isSubmitting = false.obs;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
     _isSubmitting.value = true;
@@ -32,19 +34,44 @@ class _LoginViewState extends State<LoginView> {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
 
-      final response = await Supabase.instance.client.auth.signInWithPassword(
+      // Supabase Sign Up
+      final response = await Supabase.instance.client.auth.signUp(
         email: email,
         password: password,
       );
 
-      if (response.session != null) {
-        Get.offAllNamed('/home');
+      if (response.user != null) {
+        // If email confirmation is required, user is created but session might be null.
+        // If confirmation is disabled, user session is automatically active.
+        if (response.session != null) {
+          Get.snackbar(
+            'Registrasi Berhasil',
+            'Akun Anda berhasil didaftarkan.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: AppTheme.accentSurface,
+            colorText: AppTheme.accent,
+            margin: const EdgeInsets.all(16),
+          );
+          Get.offAllNamed('/home');
+        } else {
+          Get.defaultDialog(
+            title: 'Verifikasi Surel',
+            middleText: 'Silakan periksa kotak masuk surel Anda untuk memverifikasi pendaftaran sebelum masuk.',
+            textConfirm: 'Paham',
+            confirmTextColor: Colors.black,
+            buttonColor: AppTheme.accent,
+            onConfirm: () {
+              Get.back(); // close dialog
+              Get.offAllNamed('/login');
+            },
+          );
+        }
       } else {
-        throw const AuthException('Gagal membuat sesi masuk.');
+        throw const AuthException('Gagal membuat akun.');
       }
     } on AuthException catch (err) {
       Get.snackbar(
-        'Gagal Masuk',
+        'Registrasi Gagal',
         err.message,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppTheme.dangerSurface,
@@ -53,7 +80,7 @@ class _LoginViewState extends State<LoginView> {
       );
     } catch (err) {
       Get.snackbar(
-        'Gagal Masuk',
+        'Registrasi Gagal',
         'Terjadi kesalahan tidak terduga. Silakan coba kembali.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppTheme.dangerSurface,
@@ -69,6 +96,14 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -79,7 +114,7 @@ class _LoginViewState extends State<LoginView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Logo/Header Block
+                  // Header Block
                   Center(
                     child: Column(
                       children: [
@@ -92,14 +127,14 @@ class _LoginViewState extends State<LoginView> {
                             boxShadow: AppTheme.accentGlow,
                           ),
                           child: const Icon(
-                            Icons.lock_open_rounded,
+                            Icons.person_add_alt_1_rounded,
                             size: 36,
                             color: Color(0xFF003300),
                           ),
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'PinjamKuy',
+                          'Buat Akun Baru',
                           style: GoogleFonts.inter(
                             fontSize: 32,
                             fontWeight: FontWeight.w800,
@@ -109,7 +144,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Masuk untuk menggunakan sistem peminjaman',
+                          'Daftar untuk meminjam barang dan ruangan',
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             color: AppTheme.textSecondary,
@@ -118,7 +153,7 @@ class _LoginViewState extends State<LoginView> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 40),
 
                   // Email Input
                   Text(
@@ -151,7 +186,7 @@ class _LoginViewState extends State<LoginView> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
                   // Password Input
                   Text(
@@ -168,7 +203,7 @@ class _LoginViewState extends State<LoginView> {
                     obscureText: true,
                     style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
                     decoration: const InputDecoration(
-                      hintText: 'Masukkan kata sandi',
+                      hintText: 'Minimal 6 karakter',
                       prefixIcon: Icon(
                         Icons.lock_outline_rounded,
                         color: AppTheme.textTertiary,
@@ -184,36 +219,47 @@ class _LoginViewState extends State<LoginView> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 20),
 
-                  // Forgot Password Button
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () => Get.toNamed('/forgot-password'),
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        'Lupa Kata Sandi?',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.accent,
-                        ),
-                      ),
+                  // Confirm Password Input
+                  Text(
+                    'Konfirmasi Kata Sandi',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    obscureText: true,
+                    style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
+                    decoration: const InputDecoration(
+                      hintText: 'Ulangi kata sandi',
+                      prefixIcon: Icon(
+                        Icons.lock_outline_rounded,
+                        color: AppTheme.textTertiary,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Konfirmasi kata sandi harus diisi';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Konfirmasi kata sandi tidak cocok';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 32),
 
                   // Submit Button
                   Obx(() => SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: _isSubmitting.value ? null : _handleLogin,
+                      onPressed: _isSubmitting.value ? null : _handleRegister,
                       child: _isSubmitting.value
                           ? const SizedBox(
                               width: 20,
@@ -227,7 +273,7 @@ class _LoginViewState extends State<LoginView> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Masuk Sekarang',
+                                  'Daftar Sekarang',
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
@@ -239,32 +285,6 @@ class _LoginViewState extends State<LoginView> {
                             ),
                     ),
                   )),
-                  const SizedBox(height: 24),
-
-                  // Register Option
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Belum punya akun? ',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Get.toNamed('/register'),
-                        child: Text(
-                          'Daftar Sekarang',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.accent,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

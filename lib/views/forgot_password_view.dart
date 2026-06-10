@@ -4,47 +4,51 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class ForgotPasswordView extends StatefulWidget {
+  const ForgotPasswordView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<ForgotPasswordView> createState() => _ForgotPasswordViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _isSubmitting = false.obs;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleResetPassword() async {
     if (!_formKey.currentState!.validate()) return;
 
     _isSubmitting.value = true;
     try {
       final email = _emailController.text.trim();
-      final password = _passwordController.text;
 
-      final response = await Supabase.instance.client.auth.signInWithPassword(
-        email: email,
-        password: password,
+      // Trigger Supabase password reset link
+      await Supabase.instance.client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'https://pinjamkuy.vercel.app/#recovery',
       );
 
-      if (response.session != null) {
-        Get.offAllNamed('/home');
-      } else {
-        throw const AuthException('Gagal membuat sesi masuk.');
-      }
+      Get.defaultDialog(
+        title: 'Tautan Dikirim',
+        middleText: 'Tautan pemulihan kata sandi telah dikirim ke surel Anda. Silakan ikuti instruksi pada surel tersebut.',
+        textConfirm: 'Kembali Ke Login',
+        confirmTextColor: Colors.black,
+        buttonColor: AppTheme.accent,
+        onConfirm: () {
+          Get.back(); // close dialog
+          Get.offAllNamed('/login');
+        },
+      );
     } on AuthException catch (err) {
       Get.snackbar(
-        'Gagal Masuk',
+        'Pemulihan Gagal',
         err.message,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppTheme.dangerSurface,
@@ -53,7 +57,7 @@ class _LoginViewState extends State<LoginView> {
       );
     } catch (err) {
       Get.snackbar(
-        'Gagal Masuk',
+        'Pemulihan Gagal',
         'Terjadi kesalahan tidak terduga. Silakan coba kembali.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppTheme.dangerSurface,
@@ -69,6 +73,14 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -79,7 +91,7 @@ class _LoginViewState extends State<LoginView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Logo/Header Block
+                  // Header Block
                   Center(
                     child: Column(
                       children: [
@@ -92,14 +104,14 @@ class _LoginViewState extends State<LoginView> {
                             boxShadow: AppTheme.accentGlow,
                           ),
                           child: const Icon(
-                            Icons.lock_open_rounded,
+                            Icons.lock_reset_rounded,
                             size: 36,
                             color: Color(0xFF003300),
                           ),
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'PinjamKuy',
+                          'Lupa Kata Sandi',
                           style: GoogleFonts.inter(
                             fontSize: 32,
                             fontWeight: FontWeight.w800,
@@ -109,11 +121,12 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Masuk untuk menggunakan sistem peminjaman',
+                          'Masukkan surel untuk menerima tautan pemulihan kata sandi',
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             color: AppTheme.textSecondary,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -151,69 +164,14 @@ class _LoginViewState extends State<LoginView> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),
-
-                  // Password Input
-                  Text(
-                    'Kata Sandi',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 15),
-                    decoration: const InputDecoration(
-                      hintText: 'Masukkan kata sandi',
-                      prefixIcon: Icon(
-                        Icons.lock_outline_rounded,
-                        color: AppTheme.textTertiary,
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Kata sandi harus diisi';
-                      }
-                      if (value.length < 6) {
-                        return 'Kata sandi minimal 6 karakter';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Forgot Password Button
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () => Get.toNamed('/forgot-password'),
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        'Lupa Kata Sandi?',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.accent,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 36),
 
                   // Submit Button
                   Obx(() => SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: _isSubmitting.value ? null : _handleLogin,
+                      onPressed: _isSubmitting.value ? null : _handleResetPassword,
                       child: _isSubmitting.value
                           ? const SizedBox(
                               width: 20,
@@ -227,44 +185,18 @@ class _LoginViewState extends State<LoginView> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Masuk Sekarang',
+                                  'Kirim Tautan',
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                const Icon(Icons.arrow_forward_rounded, size: 18),
+                                const Icon(Icons.send_rounded, size: 18),
                               ],
                             ),
                     ),
                   )),
-                  const SizedBox(height: 24),
-
-                  // Register Option
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Belum punya akun? ',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Get.toNamed('/register'),
-                        child: Text(
-                          'Daftar Sekarang',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.accent,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

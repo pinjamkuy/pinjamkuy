@@ -6,6 +6,9 @@ import 'theme/app_theme.dart';
 import 'views/splash_view.dart';
 import 'views/home_view.dart';
 import 'views/login_view.dart';
+import 'views/register_view.dart';
+import 'views/forgot_password_view.dart';
+import 'services/auth_middleware.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,10 +63,22 @@ class PinjamKuyApp extends StatelessWidget {
         GetPage(
           name: '/home',
           page: () => const HomeView(),
+          middlewares: [AuthMiddleware()],
         ),
         GetPage(
           name: '/login',
           page: () => const LoginView(),
+          middlewares: [GuestMiddleware()],
+        ),
+        GetPage(
+          name: '/register',
+          page: () => const RegisterView(),
+          middlewares: [GuestMiddleware()],
+        ),
+        GetPage(
+          name: '/forgot-password',
+          page: () => const ForgotPasswordView(),
+          middlewares: [GuestMiddleware()],
         ),
       ],
     );

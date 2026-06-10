@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createClient, Session } from '@supabase/supabase-js';
 import Login from './components/Login';
+import ResetPassword from './components/ResetPassword';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import Overview from './components/Overview';
@@ -19,9 +20,19 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState<TabType>('overview');
+  
+  const checkIfResetMode = () => {
+    return window.location.hash.includes('recovery') || 
+           window.location.hash.includes('type=recovery') || 
+           window.location.search.includes('type=recovery') ||
+           window.location.href.includes('recovery');
+  };
+
+  const [isResetMode, setIsResetMode] = useState(() => checkIfResetMode());
 
   const validateSession = (currentSession: Session | null) => {
-    if (currentSession && currentSession.user.email !== 'admin@gmail.com') {
+    if (checkIfResetMode()) return currentSession;
+    if (currentSession && currentSession.user.email !== 'pinj4mkuy@gmail.com') {
       supabase.auth.signOut();
       alert('Akses Ditolak: Surel Anda tidak terdaftar sebagai Administrator.');
       return null;
@@ -37,8 +48,21 @@ export default function App() {
     });
 
     // 2. Auth State Changed Listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(validateSession(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      let resetActive = checkIfResetMode() || event === 'PASSWORD_RECOVERY';
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsResetMode(true);
+      }
+      if (event === 'SIGNED_OUT') {
+        setIsResetMode(false);
+        resetActive = false;
+      }
+      
+      if (resetActive) {
+        setSession(session);
+      } else {
+        setSession(validateSession(session));
+      }
       setLoading(false);
     });
 
@@ -53,6 +77,11 @@ export default function App() {
         <div className="w-12 h-12 border-3 border-emerald-500/10 rounded-full border-t-emerald-400 animate-spin"></div>
       </div>
     );
+  }
+
+  // If PASSWORD_RECOVERY event or recovery type hash is present, render password reset UI
+  if (isResetMode || checkIfResetMode()) {
+    return <ResetPassword />;
   }
 
   // If not authenticated, render Login
@@ -73,7 +102,7 @@ export default function App() {
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
-        <Topbar email={session.user.email ?? 'admin@pinjamkuy.com'} currentTab={currentTab} />
+        <Topbar email={session.user.email ?? 'pinj4mkuy@gmail.com'} currentTab={currentTab} />
 
         <main className="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto">
           {currentTab === 'overview' && <Overview />}
