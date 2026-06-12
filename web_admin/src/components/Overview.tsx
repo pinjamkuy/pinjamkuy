@@ -87,10 +87,25 @@ export default function Overview() {
         .eq('id', logId);
       if (logErr) throw logErr;
 
-      // 2. Set item as available
+      // 2. Fetch current quantities
+      const { data: itemData, error: fetchErr } = await supabase
+        .from('items')
+        .select('quantity, available_quantity')
+        .eq('id', itemId)
+        .single();
+      if (fetchErr) throw fetchErr;
+
+      const totalQty = itemData.quantity ?? 1;
+      const currentAvail = itemData.available_quantity ?? 0;
+      const newAvail = Math.min(totalQty, currentAvail + 1);
+
+      // 3. Update item availability and quantity
       const { error: itemErr } = await supabase
         .from('items')
-        .update({ is_available: true })
+        .update({ 
+          available_quantity: newAvail,
+          is_available: true 
+        })
         .eq('id', itemId);
       if (itemErr) throw itemErr;
 

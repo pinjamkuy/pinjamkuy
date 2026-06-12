@@ -160,8 +160,31 @@ export default function Catalog() {
       }
 
       const totalQty = editCategory === 'Barang' ? editQuantity : 1;
-      const currentlyBorrowed = (editingItem.quantity || 1) - (editingItem.available_quantity || 1);
-      const newAvail = Math.max(0, totalQty - currentlyBorrowed);
+      
+      // Count active borrows in DB for this item
+      const { count: activeBorrowsCount, error: countErr } = await supabase
+        .from('borrow_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('item_id', editingItem.id)
+        .eq('status', 'Dipinjam');
+      if (countErr) throw countErr;
+
+      const B = activeBorrowsCount || 0;
+      if (totalQty < B) {
+        alert(`Gagal mengubah stok: Saat ini ada ${B} unit "${editName}" yang sedang aktif dipinjam oleh mahasiswa. Jumlah total stok tidak boleh kurang dari ${B}.`);
+        setSubmitting(false);
+        return;
+      }
+
+      if (B > 0) {
+        const confirmSave = confirm(`Perhatian: Saat ini ada ${B} unit yang sedang aktif dipinjam oleh mahasiswa. Jika Anda mengubah total stok menjadi ${totalQty}, stok yang tersedia akan disesuaikan menjadi ${totalQty - B}. Apakah Anda ingin melanjutkan?`);
+        if (!confirmSave) {
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      const newAvail = totalQty - B;
 
       const { error } = await supabase
         .from('items')
